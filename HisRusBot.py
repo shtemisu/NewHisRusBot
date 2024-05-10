@@ -6,7 +6,7 @@ from app.handlers import router1
 
 
 async def main():
-    bot = Bot("6949421058:AAFG_aLGPaXVUu2fHccjun0LbAwwmDY-LjQ", parse_mode="HTML")
+    bot = Bot("ADD_Token", parse_mode="HTML")
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router1)
 
