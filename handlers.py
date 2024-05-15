@@ -6,42 +6,24 @@ from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver as wd
 import emoji
-
+from Other import text
 from keyboards import keyboards as kb
-from app.states import StatesWiki, StateHist
+from app.states import StatesWiki, StateHist, Gen
+from Instruments import utils
 
 router1 = Router()
 
 
 @router1.message(Command("start", "menu"))
 async def start(msg: Message):
-    await msg.answer(text=f'\nПриветствую' + emoji.emojize(':waving_hand:') + f',<b>{msg.from_user.first_name}!</b>'
-                                                                              '\n'
-                                                                              '\nЯ — <b>бот-помощник по Истории '
-                                                                              'России</b>'
-                                                                              '\nЯ храню в себе все с древних, '
-                                                                              'не запамятных времен!'
-                                                                              '\nНу и много других вещей'
-                                                                              '\nДля старта тыкни кнопочку :)'
-                                                                              '\n'
-                                                                              '\n<u>Developed by shtemisu</u>',
+    await msg.answer(text.greet.format(name={msg.from_user.first_name}),
                      reply_markup=kb.inline_kb)
 
 
 @router1.callback_query(F.data == "aboutUs")
 async def info(callback: CallbackQuery):
     await callback.answer("")
-    await callback.message.edit_text('<b><u>Создано специально для дисциплины "История России"</u></b>'
-                                     '\n'
-                                     '<b>\nРазработали студенты СВФУ им М.К. Аммосова</b>'
-                                     '<b>\nИнститута математики и информатики,группы ИТСС-23:</b>'
-                                     '\n'
-                                     '\n' + emoji.emojize('🔵') + 'Пинигин Роман — <i>главный разработчик</i>'
-                                     '\n' + emoji.emojize('🔵') + 'Ефимов Тимофей — <i>генератор идей</i>'
-                                     '\n' + emoji.emojize('🔵') + 'Аммосов Александр — <i>генератор идей</i>'
-                                     '\n' + emoji.emojize('🔵') + 'Сыроватский Айысхан — <i>генератор идей</i>'
-                                     '\n' + emoji.emojize('🔵') + 'Колодезников Еремей — <i>генератор идей</i>',
-                                     parse_mode="HTML",
+    await callback.message.edit_text(text.aboutUs,
                                      reply_markup=kb.back_kb)
 
 
@@ -54,14 +36,7 @@ async def search_msg(callback: CallbackQuery):
 @router1.callback_query(F.data == 'back')
 async def main_menu(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
-        text=f'\nПриветствую' + emoji.emojize(':waving_hand:') + f',<b>{callback.from_user.first_name}!</b>'
-                                                                 '\n'
-                                                                 '\nЯ - <b>бот-помощник по Истории России</b>'
-                                                                 '\nЯ храню в себе все с древних, не запамятных времен!'
-                                                                 '\nНу и много других вещей'
-                                                                 '\nДля старта тыкни кнопочку :)'
-                                                                 '\n'
-                                                                 '\n<u>Developed by shtemisu</u>',
+        text.greet.format(name=callback.from_user.first_name),
         reply_markup=kb.inline_kb)
     await state.clear()
 
@@ -132,3 +107,21 @@ async def stephist(message: Message, state: FSMContext):
 async def donate(callback: CallbackQuery):
     await callback.message.edit_text(text="Спасибо, что хотите нас поддержать :)"
                                           "\nПока в разработке:(", reply_markup=kb.back_kb)
+
+
+@router1.callback_query(F.data == 'ai')
+async def text_prompt(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(Gen.text_prompt)
+    await callback.message.edit_text(text.gen_text)
+    await callback.message.answer(text.gen_exit, reply_markup=kb.back_kb)
+
+
+@router1.message(Gen.text_prompt)
+async def generate_text(msg: Message):
+    prompt = msg.text
+    msg = await msg.answer(text.gen_wait)
+    res = await utils.generate_answer(prompt)
+
+    if not res:
+        return await msg.edit_text(text.gen_error, reply_markup=kb.back_kb)
+    await msg.answer(res, disable_web_page_preview=True, reply_markup=kb.back_kb)
