@@ -11,7 +11,7 @@ inline_kb = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="О нас"+emoji.emojize(':speech_balloon:'), callback_data='aboutUs'),
         InlineKeyboardButton(text="Связаться с разработчиком"+emoji.emojize(':alien_monster:'),
                              url='https://t.me/shemisu'),
-        InlineKeyboardButton(text="Поддержать нас"+emoji.emojize("💸"), callback_data='donate')
+        InlineKeyboardButton(text="Общаться с историком"+emoji.emojize("💸"), callback_data='ai')
     ],
     [
         InlineKeyboardButton(text="Начать поиск..."+emoji.emojize('🔎'), callback_data='search')
