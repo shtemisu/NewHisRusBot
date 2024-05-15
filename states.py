@@ -9,3 +9,11 @@ class StatesWiki(StatesGroup):
 class StateHist(StatesGroup):
     wait_result = State()
     got_result = State()
+
+
+class Gen(StatesGroup):
+    text_prompt = State()
+
+
+
+
