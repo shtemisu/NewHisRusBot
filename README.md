@@ -1,2 +1,6 @@
-# NewHisRusBot
-The Telegram bot made with aiogram 3.x
+# Russian History Helper
+The Telegram bot made using aiogram 3.x, selenium, bs4, gpt4free
+
+This bot knows more information about everything
+
+
